@@ -1788,7 +1788,7 @@ private noncomputable def rootPowerSum (p : ℂ[X]) (m : ℕ) : ℂ :=
 private theorem rootPowerSum_newton_raw (p : ℂ[X]) {k : ℕ} (hk : 0 < k) :
     rootPowerSum p k =
       (-1 : ℂ) ^ (k + 1) * k * p.roots.esymm k -
-        ∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+        ∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
           (-1 : ℂ) ^ a.1 * p.roots.esymm a.1 *
             rootPowerSum p a.2 := by
   let s := p.roots
@@ -1852,7 +1852,7 @@ private theorem rootPowerSum_newton (p : ℂ[X]) (hp : p.Monic)
     {k : ℕ} (hk : 0 < k) (hkdeg : k ≤ p.natDegree) :
     rootPowerSum p k =
       -(k : ℂ) * p.coeff (p.natDegree - k) -
-        ∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+        ∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
           p.coeff (p.natDegree - a.1) * rootPowerSum p a.2 := by
   have hv (j : ℕ) (hj : j ≤ p.natDegree) :
       (-1 : ℂ) ^ j * p.roots.esymm j =
@@ -1865,17 +1865,17 @@ private theorem rootPowerSum_newton (p : ℂ[X]) (hp : p.Monic)
   rw [rootPowerSum_newton_raw p hk]
   calc
     (-1 : ℂ) ^ (k + 1) * k * p.roots.esymm k -
-          ∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+          ∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
             (-1 : ℂ) ^ a.1 * p.roots.esymm a.1 *
               rootPowerSum p a.2 =
         -(k : ℂ) * ((-1 : ℂ) ^ k * p.roots.esymm k) -
-          ∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+          ∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
             ((-1 : ℂ) ^ a.1 * p.roots.esymm a.1) *
               rootPowerSum p a.2 := by
       rw [pow_succ]
       ring
     _ = -(k : ℂ) * p.coeff (p.natDegree - k) -
-          ∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+          ∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
             p.coeff (p.natDegree - a.1) *
               rootPowerSum p a.2 := by
       rw [hv k hkdeg]
@@ -1914,14 +1914,14 @@ private theorem complexLiftedChebQ_coeff_inner {n j k : ℕ}
 
 private theorem complexLiftedChebQ_newton_inner_sum {n k : ℕ}
     (hk : 3 ≤ k) (hkmax : k ≤ 2 * n - 2) :
-    (∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+    (∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
         (complexLiftedChebQ n).coeff (2 * n - a.1) *
           rootPowerSum (complexLiftedChebQ n) a.2) =
       -(1 / 6 : ℂ) * complexLiftedPowerSum n (k - 2) := by
   have hpair :
       (2, k - 2) ∈
-        (Finset.antidiagonal k).filter (fun a ↦ a.1 ∈ Set.Ioo 0 k) := by
-    simp only [Finset.mem_filter, Finset.mem_antidiagonal, Set.mem_Ioo]
+        (Finset.HasAntidiagonal.antidiagonal k).filter (fun a ↦ a.1 ∈ Set.Ioo 0 k) := by
+    simp only [Finset.mem_filter, Finset.HasAntidiagonal.mem_antidiagonal, Set.mem_Ioo]
     omega
   rw [Finset.sum_eq_single_of_mem (2, k - 2) hpair]
   · rw [complexLiftedChebQ_coeff_inner (j := 2) (k := k)
@@ -1938,7 +1938,7 @@ private theorem complexLiftedChebQ_newton_inner_sum {n k : ℕ}
       apply Prod.ext
       · exact hj
       · have hadi : a.1 + a.2 = k :=
-          Finset.mem_antidiagonal.mp ha'.1
+          Finset.HasAntidiagonal.mem_antidiagonal.mp ha'.1
         omega
     simp [hjne]
 
@@ -1965,7 +1965,7 @@ private theorem complexLiftedPowerSum_recurrence {n k : ℕ}
 
 private theorem complexLiftedChebQ_newton_inner_sum_small {n k : ℕ}
     (hk : 0 < k) (hksmall : k ≤ 2) (hkmax : k ≤ 2 * n - 2) :
-    (∑ a ∈ Finset.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
+    (∑ a ∈ Finset.HasAntidiagonal.antidiagonal k with a.1 ∈ Set.Ioo 0 k,
         (complexLiftedChebQ n).coeff (2 * n - a.1) *
           rootPowerSum (complexLiftedChebQ n) a.2) = 0 := by
   apply Finset.sum_eq_zero
@@ -2368,7 +2368,8 @@ theorem degree_chebExpansion_lt {n : ℕ} (c : Fin n → ℝ) :
       · exact degree_C_le
       · simp
     _ < (n : WithBot ℕ) := by
-      simpa only [zero_add] using (WithBot.coe_lt_coe.mpr j.isLt)
+      rw [zero_add]
+      exact_mod_cast j.isLt
 
 /-- The `k`th Lagrange polynomial has as its Chebyshev coefficients the
 `k`th column of the inverse evaluation matrix. -/
@@ -3114,7 +3115,7 @@ lemma sum_dist_pow_offDiag_le
     (∑ j ∈ sameParityOffDiag N i,
       q ^ (i.val.dist j.val / 2)) ≤ (2 : ℝ) / 5 := by
   have hi : i ∈ sameParityIndices N i := by
-    simp [sameParityIndices, SameParity]
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, rfl⟩
   have hsplit := Finset.sum_erase_add
     (sameParityIndices N i)
     (fun j ↦ q ^ (i.val.dist j.val / 2)) hi
@@ -3735,7 +3736,7 @@ lemma sum_traceTerm_row_eq_diag_add_offDiag
       traceTerm N i i +
         ∑ j ∈ sameParityOffDiag N i, traceTerm N i j := by
   have hi : i ∈ sameParityIndices N i := by
-    simp [sameParityIndices, SameParity]
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, rfl⟩
   have hrestrict :
       (∑ j ∈ sameParityIndices N i, traceTerm N i j) =
         ∑ j : Fin (N + 1), traceTerm N i j := by
